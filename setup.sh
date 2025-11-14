@@ -32,7 +32,7 @@ fi
 
 # List of scripts to run in order
 scripts_to_run=(
-    "setup-ros.sh"
+    "setup-deps.sh"
 )
 
 echo "Starting setup..."
