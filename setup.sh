@@ -6,22 +6,30 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 SETUP_DIR="$SCRIPT_DIR/setup"
 
-echo "Installing ROS 2 dependencies..."
+# List of scripts to run in order
+scripts_to_run=(
+    "setup-ros.sh"
+)
 
-# Update package lists
-sudo apt-get update
+echo "Starting setup..."
 
-# Install ROS 2 build tools and dependencies
-echo "Installing ament_cmake..."
-sudo apt-get install -y ros-$ROS_DISTRO-ament-cmake
-
-echo "Installing ament_cmake_python..."
-sudo apt-get install -y ros-$ROS_DISTRO-ament-cmake-python
-
-echo "Installing rclcpp..."
-sudo apt-get install -y ros-$ROS_DISTRO-rclcpp
-
-echo "Installing rclpy..."
-sudo apt-get install -y ros-$ROS_DISTRO-rclpy
+for script in "${scripts_to_run[@]}"; do
+    script_path="$SETUP_DIR/$script"
+    if [ -f "$script_path" ]; then
+        echo "Running $script..."
+        # Make sure the script is executable
+        chmod +x "$script_path"
+        # Run the script
+        if "$script_path"; then
+            echo "SUCCESS: $script finished successfully."
+        else
+            echo "ERROR: $script failed." >&2
+            # Exit the main script if a sub-script fails
+            exit 1
+        fi
+    else
+        echo "WARNING: $script not found in $SETUP_DIR."
+    fi
+done
 
 echo "Setup finished successfully."
