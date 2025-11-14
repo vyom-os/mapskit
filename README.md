@@ -1,12 +1,12 @@
-# Mavlink Manager (mavman)
+# mapskit
 
-`mavman` is a ROS2 package responsible for managing all MAVLink-related services and nodes within the system. It handles `mavproxy` services, as well as both C++ (`.cpp`) and Python (`.py`) ROS2 nodes that interact with the MAVLink protocol.
+`mapskit` package responsible for both C++ (`.cpp`) and Python (`.py`) nodes that interact with the ompl and octomap protocol.
 
 This package uses a combination of `ament_cmake` for C++ components and `ament_cmake_python` for Python nodes, allowing for a unified build process managed by CMake.
 
 ## Adding a new Python Node
 
-To add a new Python node to `mavman`, follow these steps:
+To add a new Python node to `mapskit`, follow these steps:
 
 1.  **Create your Python script**
 
@@ -40,22 +40,22 @@ To add a new Python node to `mavman`, follow these steps:
     )
     ```
 
-By following these steps, your new Python node will be properly integrated into the `mavman` package and built alongside the C++ components using `ament_cmake`.
+By following these steps, your new Python node will be properly integrated into the `mapskit` package and built alongside the C++ components using `ament_cmake`.
 
 ## Adding a new C++ Node
 
-To add a new C++ node to `mavman`, follow these steps:
+To add a new C++ node to `mapskit`, follow these steps:
 
 1.  **Create your C++ source and header files**
 
-    Create your header file inside the `include/mavman` directory (e.g., `include/mavman/my_new_node.hpp`) and your source file inside the `src` directory (e.g., `src/my_new_node.cpp`).
+    Create your header file inside the `include/mapskit` directory (e.g., `include/mapskit/my_new_node.hpp`) and your source file inside the `src` directory (e.g., `src/my_new_node.cpp`).
 
 2.  **Include the header in your source file**
 
-    In your `.cpp` file, include the corresponding header. The `mavman` package is configured to find headers from the `include` directory.
+    In your `.cpp` file, include the corresponding header. The `mapskit` package is configured to find headers from the `include` directory.
 
     ```cpp
-    #include "mavman/my_new_node.hpp"
+    #include "mapskit/my_new_node.hpp"
     // ... rest of your node code
     ```
 
