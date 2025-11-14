@@ -26,9 +26,9 @@ jobs:
           - os: ubuntu-22.04
             arch: x64
             runs-on: ubuntu-22.04
-          - os: ubuntu-latest
-            arch: x64
-            runs-on: ubuntu-latest
+          # - os: ubuntu-latest
+          #   arch: x64
+          #   runs-on: ubuntu-latest
           # Self-hosted runner - ARM64 (NVIDIA Orin Nano)
           # - os: ubuntu-22.04
           #   arch: arm64
@@ -37,9 +37,20 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Cache apt packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          /var/cache/apt/archives
+          /var/lib/apt/lists
+        key: ${{ runner.os }}-apt-${{ hashFiles('**/setup.sh') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-
+
     - name: Run setup script
       run: |
         chmod +x setup.sh
+        chmod +x setup/*
         ./setup.sh
 
     - name: Configure CMake
