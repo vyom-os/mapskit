@@ -81,3 +81,8 @@ To add a new C++ node to `mapskit`, follow these steps:
       DESTINATION lib/${PROJECT_NAME}
     )
     ```
+
+# sudo make install 
+
+find binaries in this location  `exec /usr/local/lib/mapskit/`
+python modules get installed in `/usr/local/lib/python3.10/site-packages`
