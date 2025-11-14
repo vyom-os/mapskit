@@ -4,7 +4,7 @@
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
-    auto node = std::make_shared<rclcpp::Node>("mapskit_name");
+    auto node = std::make_shared<rclcpp::Node>("mapskit_node");
     rclcpp::spin(node);
     rclcpp::shutdown();
     return 0;
