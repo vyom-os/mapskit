@@ -11,5 +11,6 @@ sudo add-apt-repository universe -y
 
 sudo apt install ros-humble-ros-base -y
 sudo apt install ros-dev-tools -y 
+sudo apt install ros-humble-ament-cmake -y 
 
 source /opt/ros/humble/setup.bash
