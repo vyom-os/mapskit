@@ -16,11 +16,12 @@ find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclpy REQUIRED)
 
+######################### Install cxx modules ##################################                              
 # Include Cpp "include" directory
 include_directories(include)
 
 # Create Cpp executable
-add_executable(cpp_executable src/cpp_node.cpp)
+add_executable(cpp_executable src/*)
 ament_target_dependencies(cpp_executable rclcpp)
 
 # Install Cpp executables
@@ -28,7 +29,9 @@ install(TARGETS
   cpp_executable
   DESTINATION lib/${PROJECT_NAME}
 )
-# Install Python modules
+
+
+######################### Install Python modules ###############################                              
 ament_python_install_package(${PROJECT_NAME})
 # Install Python executables
 install(PROGRAMS
