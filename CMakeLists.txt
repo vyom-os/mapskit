@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.8)
-project(mavman)
+cmake_minimum_required(VERSION 3.22)
+project(mapskit)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
