@@ -1,10 +1,10 @@
 #include "rclcpp/rclcpp.hpp"
-#include "mavman/cpp_header.hpp"
+#include "mapskit/cpp_header.hpp"
 
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
-    auto node = std::make_shared<rclcpp::Node>("my_node_name");
+    auto node = std::make_shared<rclcpp::Node>("mapskit_name");
     rclcpp::spin(node);
     rclcpp::shutdown();
     return 0;
