@@ -1,10 +1,9 @@
 #ifndef MAPSKIT_HPP
 #define MAPSKIT_HPP
 
-
+#include <pybind11/pybind11.h>
 #include <stdio.h>
 #include <iostream>
-#include <pybind11/pybind11.h>
 
 namespace py = pybind11;
 
@@ -32,10 +31,10 @@ public:
     
     // Public member functions
     void initialize();
+    void test_method(void);
     
 private:
     // Private member variables
-    void test_method(void);
     // Private member functions
 };
 
