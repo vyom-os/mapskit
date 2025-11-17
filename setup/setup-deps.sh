@@ -23,8 +23,7 @@ sudo apt-get install ros-humble-octomap ros-humble-octomap-mapping ros-humble-oc
 sudo apt-get install libompl-dev -y
 sudo apt-get install python3-dev cmake -y
 
-
-pip install pybind11 
+pip install "pybind11[global]"
 
 
 source /opt/ros/humble/setup.bash
