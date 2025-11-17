@@ -2,4 +2,4 @@
 
 import mapskit.module_to_import
 
-print("hello from node")
+print("hello from ros2 node")
