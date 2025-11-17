@@ -86,3 +86,13 @@ To add a new C++ node to `mapskit`, follow these steps:
 
 find binaries in this location  `exec /usr/local/lib/mapskit/`
 python modules get installed in `/usr/local/lib/python3.10/site-packages`
+
+
+# Add site-packages to PYTHONPATH 
+
+if it's not already there in `.bashrc`
+```
+if [[ ":$PYTHONPATH:" != *":/usr/local/lib/python3.10/site-packages:"* ]]; then
+    export PYTHONPATH="/usr/local/lib/python3.10/site-packages${PYTHONPATH:+":$PYTHONPATH"}"
+fi
+```
