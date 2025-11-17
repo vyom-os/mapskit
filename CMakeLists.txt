@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(mapskit)
+project(mapskit LANGUAGES CXX)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
@@ -16,24 +16,43 @@ find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclpy REQUIRED)
 
+set(PYBIND11_FINDPYTHON ON)
+find_package(Python 3.10 COMPONENTS Interpreter Development REQUIRED)
+find_package(pybind11 CONFIG REQUIRED)
+
 ######################### Install cxx modules ##################################                              
 # Include Cpp "include" directory
 include_directories(include)
 
 # Create Cpp executable
-add_executable(cpp_executable src/*)
-ament_target_dependencies(cpp_executable rclcpp)
+file(GLOB SOURCES "src/*.cpp")
+add_executable(mapskit_cxx ${SOURCES})
+ament_target_dependencies(mapskit_cxx rclcpp)
+target_link_libraries(mapskit_cxx pybind11::embed)
 
 # Install Cpp executables
 install(TARGETS
-  cpp_executable
+  mapskit_cxx
   DESTINATION lib/${PROJECT_NAME}
 )
 
 
 ######################### Install Python modules ###############################                              
 ament_python_install_package(${PROJECT_NAME})
+
+# pybind11_add_module(<name> [MODULE | SHARED] [EXCLUDE_FROM_ALL]
+#                 [NO_EXTRAS] [THIN_LTO] [OPT_SIZE] source1 [source2 ...])
+
+
+set(py_sources src/mapskit.cpp)
+pybind11_add_module(mapskit ${py_sources})
+
 # Install Python executables
+install(TARGETS
+  mapskit
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 install(PROGRAMS
   scripts/py_node.py
   DESTINATION lib/${PROJECT_NAME}
