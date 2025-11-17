@@ -38,19 +38,19 @@ install(TARGETS
 
 
 ######################### Install Python modules ###############################                              
-ament_python_install_package(${PROJECT_NAME})
+# ament_python_install_package(${PROJECT_NAME})
 
 # pybind11_add_module(<name> [MODULE | SHARED] [EXCLUDE_FROM_ALL]
 #                 [NO_EXTRAS] [THIN_LTO] [OPT_SIZE] source1 [source2 ...])
 
 
 set(py_sources src/mapskit.cpp)
-pybind11_add_module(mapskit ${py_sources})
+pybind11_add_module(mapskit SHARED ${py_sources})
 
 # Install Python executables
 install(TARGETS
   mapskit
-  DESTINATION lib/${PROJECT_NAME}
+  DESTINATION  ${Python_SITELIB}
 )
 
 install(PROGRAMS
