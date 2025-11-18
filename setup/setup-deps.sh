@@ -19,7 +19,7 @@ sudo apt install ros-humble-ros-base -y
 sudo apt install ros-dev-tools -y 
 sudo apt install ros-humble-ament-cmake -y 
 
-sudo apt-get install ros-humble-octomap ros-humble-octomap-mapping ros-humble-octomap-msgs -y
+sudo apt-get install ros-humble-pcl-ros ros-humble-octomap ros-humble-octomap-mapping ros-humble-topic-tools ros-humble-octomap-msgs -y
 sudo apt-get install libompl-dev -y
 sudo apt-get install python3-dev cmake -y
 
