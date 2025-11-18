@@ -17,8 +17,7 @@ void MapsKit::test_method(void){
     std::cout << "hi from test_method" << std::endl;
 }
 
-
-PYBIND11_MODULE(mapskit, m) {
+PYBIND11_MODULE(mapskit_core_py, m) {
     m.doc() = "pybind11 mapskit plugin"; // optional module docstring
 
     py::class_<MapsKit>(m, "MapsKit")
