@@ -10,12 +10,32 @@ def generate_launch_description():
     # Declare the launch argument for the input cloud topic
     cloud_in_topic_arg = DeclareLaunchArgument(
         'cloud_in_topic',
-        default_value='/depth/points',
+        default_value='camera/depth/points',
         description='Point cloud topic to subscribe to for OctoMap.'
+    )
+
+    # Declare launch arguments for output topics
+    octomap_full_topic_arg = DeclareLaunchArgument(
+        'octomap_full_topic',
+        default_value='mapskit/voxelmap_full',
+        description='Topic for the full OctoMap.'
+    )
+    octomap_binary_topic_arg = DeclareLaunchArgument(
+        'octomap_binary_topic',
+        default_value='mapskit/voxelmap_binary',
+        description='Topic for the binary OctoMap.'
+    )
+    octomap_centers_topic_arg = DeclareLaunchArgument(
+        'octomap_centers_topic',
+        default_value='mapskit/voxelmap_centers',
+        description='Topic for the OctoMap point cloud centers.'
     )
 
     # Get the launch configuration
     cloud_in_topic = LaunchConfiguration('cloud_in_topic')
+    octomap_full_topic = LaunchConfiguration('octomap_full_topic')
+    octomap_binary_topic = LaunchConfiguration('octomap_binary_topic')
+    octomap_centers_topic = LaunchConfiguration('octomap_centers_topic')
 
     # Default parameters for the octomap_server node
     default_params = {
@@ -37,7 +57,6 @@ def generate_launch_description():
         'point_cloud_max_z': 100.0,
         
         # TRACKING CONFIGURATION
-        'save_directory': os.getenv('OCTOMAP_SAVE_DIR', './'),
         'track_changes': True,
         'listen_changes': False,
         'topic_changes': '/mapskit/changeset',
@@ -48,15 +67,21 @@ def generate_launch_description():
     octomap_server_node = Node(
         package='octomap_server',
         executable='tracking_octomap_server_node',
-        name='octomap_server',
-        output='screen',
+        name='mapskit_node',
+        # output='screen',
         parameters=[default_params],
         remappings=[
-            ('cloud_in', cloud_in_topic)
+            ('cloud_in', cloud_in_topic),
+            ('octomap_full', octomap_full_topic),
+            ('octomap_binary', octomap_binary_topic),
+            ('octomap_point_cloud_centers', octomap_centers_topic)
         ]
     )
 
     return LaunchDescription([
         cloud_in_topic_arg,
+        octomap_full_topic_arg,
+        octomap_binary_topic_arg,
+        octomap_centers_topic_arg,
         octomap_server_node
     ])
