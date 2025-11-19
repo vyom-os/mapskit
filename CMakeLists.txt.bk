@@ -1,0 +1,143 @@
+cmake_minimum_required(VERSION 3.22)
+project(mapskit LANGUAGES CXX)
+
+# Set a default build type if none was specified
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose build type: Debug, Release, RelWithDebInfo, MinSizeRel." FORCE)
+endif()
+
+
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17)
+endif()
+
+# Set compiler flags based on build type
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # Common flags for all builds
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
+
+  # Release flags (optimizations, no debug info)
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
+
+  # Debug flags (debug info, no optimizations)
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+endif()
+
+
+include(FetchContent)
+
+FetchContent_Declare(
+    fkYAML
+    GIT_REPOSITORY https://github.com/fktn-k/fkYAML.git
+    GIT_TAG v0.4.2
+)
+FetchContent_MakeAvailable(fkYAML)
+
+# find dependencies
+find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclpy REQUIRED)
+
+set(PYBIND11_FINDPYTHON ON)
+find_package(Python 3.10 COMPONENTS Interpreter Development REQUIRED)
+find_package(pybind11 CONFIG REQUIRED)
+
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+################################################################################
+############################## DEBUG ###########################################
+################################################################################
+  # Include Cpp "include" directory
+  include_directories(include)
+  
+  add_executable(test_fkyaml tests/tutorial.cpp)
+  target_link_libraries(test_fkyaml PUBLIC fkYAML::fkYAML)
+
+  add_executable(test_procs tests/test.cpp)
+  target_link_libraries(test_fkyaml PUBLIC fkYAML::fkYAML)
+
+  file(GLOB SOURCES "src/*.cpp")
+
+  target_compile_definitions(test_procs PRIVATE 
+      "MAPSKIT_CONFIG_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/config/default_conf.yaml\""
+      "MAPSKIT_LAUNCH_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/launch/tracking.launch.py\""
+  )
+
+  install(TARGETS
+    test_fkyaml
+    test_procs
+    DESTINATION lib/${PROJECT_NAME}
+  )
+
+else() # Release, RelWithDebInfo, MinSizeRel
+
+################################################################################
+############################## RELEASE #########################################
+################################################################################
+
+  # [INSTALL] Install the config directory to share/mapskit/config
+  install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
+
+  # [INSTALL] Install the launch directory to share/mapskit/launch
+  install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
+
+  ######################### Install cxx modules ################################                              
+  # Include Cpp "include" directory
+  include_directories(include)
+
+  # Create Cpp executable
+  set(mapskit_core_sources src/mapskit.cpp)
+  file(GLOB SOURCES "src/*.cpp")
+
+  add_executable(mapskit_core_cxx ${SOURCES})
+  ament_target_dependencies(mapskit_core_cxx rclcpp)
+  target_link_libraries(mapskit_core_cxx pybind11 fkYAML::fkYAML)
+  
+  # [INSTALL] Point to the installed location
+  target_compile_definitions(mapskit_core_cxx PRIVATE
+      "MAPSKIT_CONFIG_PATH=\"${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/config/default_conf.yaml\""
+      "MAPSKIT_LAUNCH_PATH=\"${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/launch/tracking.launch.py\""
+  )
+
+  install(TARGETS
+    mapskit_core_cxx
+    DESTINATION lib/${PROJECT_NAME}
+  )
+  ######################### Install Python modules #############################                             
+  ament_python_install_package(${PROJECT_NAME})
+  pybind11_add_module(mapskit_core_py SHARED ${mapskit_core_sources})
+
+  # [INSTALL] Point to the installed location for the Python extension too
+  target_compile_definitions(mapskit_core_py PRIVATE
+      "MAPSKIT_CONFIG_PATH=\"${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/config/default_conf.yaml\""
+      "MAPSKIT_LAUNCH_PATH=\"${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/launch/tracking.launch.py\""
+  )
+
+  # Install Python executables
+  install(TARGETS
+    mapskit_core_py
+    DESTINATION  ${Python_SITELIB}
+  )
+
+  install(PROGRAMS
+    scripts/py_node.py
+    DESTINATION lib/${PROJECT_NAME}
+  )
+################################################################################
+endif()
+
+
+
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  # the following line skips the linter which checks for copyrights
+  # comment the line when a copyright and license is added to all source files
+  set(ament_cmake_copyright_FOUND TRUE)
+  # the following line skips cpplint (only works in a git repo)
+  # comment the line when this package is in a git repo and when
+  # a copyright and license is added to all source files
+  set(ament_cmake_cpplint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+endif()
+
+ament_package()
