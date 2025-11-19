@@ -2,3 +2,6 @@ build/*
 playground/
 external
 external/
+launch/__pycache__/*
+mapskit/__pycache__/*
+.vscode/settings.json
