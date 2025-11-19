@@ -96,3 +96,9 @@ if [[ ":$PYTHONPATH:" != *":/usr/local/lib/python3.10/site-packages:"* ]]; then
     export PYTHONPATH="/usr/local/lib/python3.10/site-packages${PYTHONPATH:+":$PYTHONPATH"}"
 fi
 ```
+
+# launch tracking.launch.py 
+
+```
+ros2 launch launch/tracking.launch.py octomap_centers_topic:=test123ros2
+```
