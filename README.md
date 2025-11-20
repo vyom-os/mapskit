@@ -88,6 +88,10 @@ find binaries in this location  `exec /usr/local/lib/mapskit/`
 python modules get installed in `/usr/local/lib/python3.10/site-packages`
 
 
+# Build instructions 
+-DCMAKE_PREFIX_PATH=/vyomos/playground/install
+
+
 # Add site-packages to PYTHONPATH 
 
 if it's not already there in `.bashrc`
