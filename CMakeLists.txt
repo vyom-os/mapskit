@@ -23,6 +23,16 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 endif()
 
+
+include(FetchContent)
+
+FetchContent_Declare(
+    fkYAML
+    GIT_REPOSITORY https://github.com/fktn-k/fkYAML.git
+    GIT_TAG v0.4.2
+)
+FetchContent_MakeAvailable(fkYAML)
+
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
@@ -33,26 +43,43 @@ set(PYBIND11_FINDPYTHON ON)
 find_package(Python 3.10 COMPONENTS Interpreter Development REQUIRED)
 find_package(pybind11 CONFIG REQUIRED)
 
-# Get the CMAKE_PREFIX_PATH value (or another variable)
-# Note: The value might be a list of paths, so this approach is best for a single path
-# or a joined list if your application can handle parsing a string list.
-string(JOIN ";" PREFIX_PATHS_STR "${CMAKE_PREFIX_PATH}")
-
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
-  # add_executable(mapskit_core_cxx_debug ${SOURCES})
-  # ament_target_dependencies(mapskit_core_cxx_debug rclcpp)
-  # target_link_libraries(mapskit_core_cxx_debug pybind11::embed)
+################################################################################
+############################## DEBUG ###########################################
+################################################################################
+  # Include Cpp "include" directory
+  include_directories(include)
+  
+  add_executable(test_fkyaml tests/tutorial.cpp)
+  target_link_libraries(test_fkyaml PUBLIC fkYAML::fkYAML)
 
-  add_executable(test_preproc src/cpp_node.cpp)
-  target_compile_definitions(test_preproc PRIVATE 
-      "MY_APP_PREFIX_PATH=\"${CMAKE_INSTALL_PREFIX}\""
+  add_executable(test_procs tests/test.cpp)
+  target_link_libraries(test_fkyaml PUBLIC fkYAML::fkYAML)
+
+  file(GLOB SOURCES "src/*.cpp")
+
+  target_compile_definitions(test_procs PRIVATE 
+      "MAPSKIT_CONFIG_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/config/default_conf.yaml\""
+      "MAPSKIT_LAUNCH_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/launch/tracking.launch.py\""
   )
 
   install(TARGETS
-    test_preproc
+    test_fkyaml
+    test_procs
     DESTINATION lib/${PROJECT_NAME}
   )
+
 else() # Release, RelWithDebInfo, MinSizeRel
+
+################################################################################
+############################## RELEASE #########################################
+################################################################################
+
+  # [INSTALL] Install the config directory to share/mapskit/config
+  install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
+
+  # [INSTALL] Install the launch directory to share/mapskit/launch
+  install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 
   ######################### Install cxx modules ################################                              
   # Include Cpp "include" directory
@@ -60,18 +87,31 @@ else() # Release, RelWithDebInfo, MinSizeRel
 
   # Create Cpp executable
   set(mapskit_core_sources src/mapskit.cpp)
-  file(GLOB SOURCES "src/*.cpp") # USE LATER FOR OTHER THINGS ? 
+  file(GLOB SOURCES "src/*.cpp")
 
-add_executable(mapskit_core_cxx_release ${SOURCES})
-  ament_target_dependencies(mapskit_core_cxx_release rclcpp)
-  target_link_libraries(mapskit_core_cxx_release pybind11::embed)
+  add_executable(mapskit_core_cxx ${SOURCES})
+  ament_target_dependencies(mapskit_core_cxx rclcpp)
+  target_link_libraries(mapskit_core_cxx pybind11::embed fkYAML::fkYAML)
+  
+  # [INSTALL] Point to the installed location
+  target_compile_definitions(mapskit_core_cxx PRIVATE
+      "MAPSKIT_CONFIG_PATH=\"${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/config/default_conf.yaml\""
+      "MAPSKIT_LAUNCH_PATH=\"${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/launch/tracking.launch.py\""
+  )
+
   install(TARGETS
-    mapskit_core_cxx_release
+    mapskit_core_cxx
     DESTINATION lib/${PROJECT_NAME}
   )
   ######################### Install Python modules #############################                             
   ament_python_install_package(${PROJECT_NAME})
   pybind11_add_module(mapskit_core_py SHARED ${mapskit_core_sources})
+
+  # [INSTALL] Point to the installed location for the Python extension too
+  target_compile_definitions(mapskit_core_py PRIVATE
+      "MAPSKIT_CONFIG_PATH=\"${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/config/default_conf.yaml\""
+      "MAPSKIT_LAUNCH_PATH=\"${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/launch/tracking.launch.py\""
+  )
 
   # Install Python executables
   install(TARGETS
@@ -83,8 +123,7 @@ add_executable(mapskit_core_cxx_release ${SOURCES})
     scripts/py_node.py
     DESTINATION lib/${PROJECT_NAME}
   )
-
-
+################################################################################
 endif()
 
 
