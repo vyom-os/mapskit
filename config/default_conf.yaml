@@ -1,0 +1,32 @@
+mapskit_voxel_server:
+  ros__parameters:
+    # Topics
+    cloud_in_topic: 'camera/depth/points'
+    voxelmap_full_topic: 'mapskit/voxelmap_full'
+    voxelmap_binary_topic: 'mapskit/voxelmap_binary'
+    voxelmap_centers_topic: 'mapskit/voxelmap_centers'
+
+    # Map Resolution and Frames
+    resolution: 0.05
+    frame_id: 'odom'
+    base_frame_id: 'base_link'
+    use_sim_time: False
+    
+    # TF Buffer for handling timing issues
+    tf_buffer_duration: 2.0
+    
+    # Sensor Configuration
+    sensor_model:
+      max_range: 5.0
+    
+    # Disable ground filtering for better change detection
+    ground_filter:
+      enable: False
+    point_cloud_min_z: -100.0
+    point_cloud_max_z: 100.0
+    
+    # TRACKING CONFIGURATION
+    track_changes: True
+    listen_changes: False
+    topic_changes: '/mapskit/test_changes'
+    change_id_frame: 'odom'
