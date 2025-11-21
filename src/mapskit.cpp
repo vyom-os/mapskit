@@ -27,12 +27,13 @@ void MapsKit::test_method(void){
 int MapsKit::run_server(void){
     // custom config
     if(config_path_ != std::string(1, '\0')){
+        std::cout << "launch using custom config at path=" << config_path_ << "\n";
         pid_t pid = fork();
         if (pid == -1) {
             return -1;
         } else if (pid == 0) {
             // Child process
-            std::string command = "source /opt/ros/humble/setup.bash && ros2 launch " + launch_path_ + " param_file:=" + config_path_;
+            std::string command = "source /opt/ros/humble/setup.bash && ros2 launch " + launch_path_ + " params_file:=" + config_path_;
             execl("/bin/bash", "bash", "-c", command.c_str(), (char *)NULL);
             _exit(127);
         }
@@ -41,6 +42,7 @@ int MapsKit::run_server(void){
     }
     // default config
     else{
+        std::cout << "launch using default config" << "\n";
         pid_t pid = fork();
         if (pid == -1) {
             return -1;
