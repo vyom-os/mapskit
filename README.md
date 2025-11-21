@@ -21,7 +21,8 @@ sudo ./setup.sh
 # build and install the package 
 
 ```
-mkdir -p build 
+mkdir -p build
+cd build
 cmake ..
 make 
 sudo make install
