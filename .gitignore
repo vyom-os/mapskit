@@ -5,3 +5,5 @@ external/
 launch/__pycache__/*
 mapskit/__pycache__/*
 .vscode/settings.json
+launch/__pycache__/tracking.launch.cpython-310.pyc
+launch/__pycache__/tracking.launch.cpython-310.pyc
