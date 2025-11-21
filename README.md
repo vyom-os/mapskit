@@ -21,7 +21,6 @@ sudo ./setup.sh
 # build and install the package 
 
 ```
-cd mapskit 
 mkdir -p build 
 cmake ..
 make 
