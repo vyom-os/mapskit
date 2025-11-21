@@ -2,107 +2,116 @@
 
 `mapskit` package responsible for both C++ (`.cpp`) and Python (`.py`) nodes that interact with the ompl and octomap protocol.
 
-This package uses a combination of `ament_cmake` for C++ components and `ament_cmake_python` for Python nodes, allowing for a unified build process managed by CMake.
 
-## Adding a new Python Node
+# download 
 
-To add a new Python node to `mapskit`, follow these steps:
+```
+mkdir -p ~/workspace/
+cd ~/workspace/
+git clone https://github.com/vyom-os/mapskit.git --recusive
+```
 
-1.  **Create your Python script**
+# install dependencies
+```
+cd mapskit 
+chmod +x setup.sh
+sudo ./setup.sh
+```
 
-    Create your Python script inside the `scripts` directory (e.g., `scripts/my_new_node.py`).
+# build and install the package 
 
-2.  **Add a Shebang**
+```
+cd mapskit 
+mkdir -p build 
+cmake ..
+make 
+sudo make install
+```
+this installs the package for a systemwide location at `/usr/local/mapskit*`
+for a more custom location change prefix path ny passing args to
+```
+cmake -DCMAKE_PREFIX_PATH=/mycustom-install-path ..
+```
+and then proceed with make as usual. 
 
-    Add the following shebang at the very top of your Python script. This ensures the script is executed with the correct Python interpreter.
+# running 
 
-    ```python
-    #!/usr/bin/env python3
-    ```
+Kindly go though the docs to understand what changes to make and how they affect the system performance, orbbec camera is used here as an example.
+* [understanding voxels](orbbec_voxels.md) 
+* [understanding tracking](orbbec_tracking.md)
 
-3.  **Make the script executable**
+this essentially replaces octomap-server with an enhanced mapskit server built on top of it offering additional features and APIs.
 
-    Before committing your file, make it executable using the following command:
+## setting up your custom config
+you can find the default configs at `/usr/local/share/mapskit/config/default_conf.yaml`
+to set your custom configs you can use the cp the default and make changes 
+```
+mkdir -p ~/.mapskit/
+cp /usr/local/share/mapskit/config/default_conf.yaml ~/.mapskit/config.yaml
+```
+change input / output, topic names as needed, tweak params etc.  
 
-    ```bash
-    chmod +x scripts/my_new_node.py
-    ```
+you can run a benchtest to verify the working by using 
+```
+./usr/local/lib/mapskit/mapskit_core_cxx /home/myuser/.mapskit/config.yaml
+```
+or just use default configs by running 
+```
+./usr/local/lib/mapskit/mapskit_core_cxx
+```
 
-4.  **Update `CMakeLists.txt`**
+## using a .service to use precompiled .cxx binary
+create a .service file at /etc/system
+```
+sudo nano /etc/systemd/system/mapskit-server.service
+```
+and append the following content 
+```
+[Unit]
+Description= mapskit-server Service
+After=network.target
 
-    To ensure your new Python node is installed correctly, add it to the `install(PROGRAMS ...)` section in your `CMakeLists.txt` file. This will install the script to the `lib/${PROJECT_NAME}` directory, making it available as an executable.
+[Service]
+ExecStart=/bin/bash -c "/usr/local/lib/mapskit/mapskit_core_cxx /home/myuser/.mapskit/config.yaml"
+Restart=on-failure
+User=myuser
+Group=mygroup
+WorkingDirectory=/opt/my_application
 
-    ```cmake
-    install(PROGRAMS
-      scripts/py_node.py
-      scripts/my_new_node.py # <-- Add your new node here
-      DESTINATION lib/${PROJECT_NAME}
-    )
-    ```
+[Install]
+WantedBy=multi-user.target
+```
 
-By following these steps, your new Python node will be properly integrated into the `mapskit` package and built alongside the C++ components using `ament_cmake`.
+start and enable this by 
+```
+sudo systemctl daemon-reload
+sudo systemctl enable --now mapskit-server.service 
+```
 
-## Adding a new C++ Node
+## API integration - Add site-packages to PYTHONPATH 
 
-To add a new C++ node to `mapskit`, follow these steps:
+try running a python3 shell and importing mapskit
+```
+python3
+import mapskit
+```
 
-1.  **Create your C++ source and header files**
+sometimes if the site install path is not there in pythonpath `import mapskit` *can fail*.
 
-    Create your header file inside the `include/mapskit` directory (e.g., `include/mapskit/my_new_node.hpp`) and your source file inside the `src` directory (e.g., `src/my_new_node.cpp`).
-
-2.  **Include the header in your source file**
-
-    In your `.cpp` file, include the corresponding header. The `mapskit` package is configured to find headers from the `include` directory.
-
-    ```cpp
-    #include "mapskit/my_new_node.hpp"
-    // ... rest of your node code
-    ```
-
-3.  **Update `CMakeLists.txt`**
-
-    To build and install your new C++ node, you need to add it to the `CMakeLists.txt` file.
-
-    First, define the new executable and link its dependencies:
-    ```cmake
-    # Add your new executable
-    add_executable(my_new_node_executable src/my_new_node.cpp)
-
-    # Link against required libraries (e.g., rclcpp)
-    ament_target_dependencies(my_new_node_executable rclcpp)
-    ```
-
-    Next, add the new executable target to the `install(TARGETS ...)` section. This will install the compiled binary to the `lib/${PROJECT_NAME}` directory.
-
-    ```cmake
-    install(TARGETS
-      cpp_executable
-      my_new_node_executable # <-- Add your new executable here
-      DESTINATION lib/${PROJECT_NAME}
-    )
-    ```
-
-# sudo make install 
-
-find binaries in this location  `exec /usr/local/lib/mapskit/`
-python modules get installed in `/usr/local/lib/python3.10/site-packages`
-
-
-# Build instructions 
--DCMAKE_PREFIX_PATH=/vyomos/playground/install
-
-
-# Add site-packages to PYTHONPATH 
-
-if it's not already there in `.bashrc`
+You can add it to `.bashrc` for a permanent fix 
 ```
 if [[ ":$PYTHONPATH:" != *":/usr/local/lib/python3.10/site-packages:"* ]]; then
     export PYTHONPATH="/usr/local/lib/python3.10/site-packages${PYTHONPATH:+":$PYTHONPATH"}"
 fi
 ```
+and then retry. 
 
-# launch tracking.launch.py 
 
-```
-ros2 launch launch/tracking.launch.py octomap_centers_topic:=test123ros2
-```
+> find binaries in this location  `exec /usr/local/lib/mapskit/`
+> python modules get installed in `/usr/local/lib/python3.10/site-packages`
+
+
+# WIP / Roadmap : 
+
+Fix and integrate remappings from topics i/o. 
+Testcases for python3 bindings ...
