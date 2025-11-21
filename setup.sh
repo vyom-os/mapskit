@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Check if running as root
+if [ "$EUID" -ne 0 ]; then
+  echo "Please run as root (e.g. sudo ./setup.sh)"
+  exit 1
+fi
+
 # This script runs setup scripts in a specific order.
 
 # Get the directory of the current script
