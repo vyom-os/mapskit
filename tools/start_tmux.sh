@@ -49,10 +49,10 @@ if [ $? != 0 ]; then
   tmux send-keys -t $SESSION_NAME:monitor.2 "clear" C-m
   tmux send-keys -t $SESSION_NAME:monitor.3 "clear" C-m
 
-  tmux send-keys -t $SESSION_NAME:monitor.0 "watch -c -t ros2 topic list" C-m
-  tmux send-keys -t $SESSION_NAME:monitor.1 "watch -c -t ros2 topic echo /camera/depth/points" C-m
-  tmux send-keys -t $SESSION_NAME:monitor.2 "watch -c -t ros2 topic echo /octomap_point_cloud_centers" C-m
-  tmux send-keys -t $SESSION_NAME:monitor.3 "watch -c -t ros2 topic echo /mapskit/changeset" C-m
+  tmux send-keys -t $SESSION_NAME:monitor.0 "watch 'ros2 topic list | grep mapskit'" C-m
+  tmux send-keys -t $SESSION_NAME:monitor.1 "ros2 topic echo /camera/depth/points" C-m
+  tmux send-keys -t $SESSION_NAME:monitor.2 "ros2 topic echo /mapkskit/voxelmap_full" C-m
+  tmux send-keys -t $SESSION_NAME:monitor.3 "ros2 topic echo /mapskit/test_changes" C-m
 
   # Select the first window
   tmux select-window -t $SESSION_NAME:monitor
