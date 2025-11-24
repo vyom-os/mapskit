@@ -106,6 +106,7 @@ else() # Release, RelWithDebInfo, MinSizeRel
   ######################### Install Python modules #############################                             
   ament_python_install_package(${PROJECT_NAME})
   pybind11_add_module(mapskit_core_py SHARED ${mapskit_core_sources})
+  target_link_libraries(mapskit_core_py PUBLIC fkYAML::fkYAML)
 
   # [INSTALL] Point to the installed location for the Python extension too
   target_compile_definitions(mapskit_core_py PRIVATE
@@ -116,11 +117,12 @@ else() # Release, RelWithDebInfo, MinSizeRel
   # Install Python executables
   install(TARGETS
     mapskit_core_py
-    DESTINATION  ${Python_SITELIB}
+    DESTINATION  ${Python_SITELIB}/mapskit
   )
 
   install(PROGRAMS
     scripts/py_node.py
+    scripts/py_demo.py
     DESTINATION lib/${PROJECT_NAME}
   )
 ################################################################################
