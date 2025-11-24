@@ -41,13 +41,14 @@ public:
     void initialize();
     void test_method(void);
     int run_server(void);
-    void shutdown_server(void);    
+    void shutdown_server(void);
+    void set_launch_path(std::string path);
 
 private:
     // Private member variables
     // Private member functions
     std::string config_path_{'\0'};
-    const std::string launch_path_ = MAPSKIT_LAUNCH_PATH;
+    std::string launch_path_ = MAPSKIT_LAUNCH_PATH;
     volatile int server_pid_{0};
 };
 
