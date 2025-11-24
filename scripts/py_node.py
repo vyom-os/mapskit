@@ -3,5 +3,6 @@
 import mapskit
 # import mapskit.module_to_import
 
-mapskit.MapsKit().test_module()
+print(f"MapsKit version: {mapskit.__version__}")
+mapskit.MapsKit()
 print("hello from ros2 node")
